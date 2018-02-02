@@ -50,10 +50,20 @@ feat_cols = [age, workclass ,education , education_num, marital_status, occupati
 
 input_func = tf.estimator.inputs.pandas_input_fn(X_train,y_train,batch_size=100,num_epochs=1000,shuffle=True)
 linear_model = tf.estimator.LinearClassifier(feature_columns=feat_cols,n_classes=2)
-
 linear_model.train(input_fn=input_func,steps=1000)
 
-eval_input_func = tf.estimator.inputs.pandas_input_fn(x=X_test,y=y_test,batch_size=10,num_epochs=1,shuffle=False)
-results = linear_model.evaluate(eval_input_func)
+pred_fn = tf.estimator.inputs.pandas_input_fn(x=X_test,batch_size=len(X_test),shuffle=False)
+pred_gen = linear_model.predict(input_fn=pred_fn)
+predictions = list((pred_gen))
 
-print(results['accuracy'])
+final_pred = [pred['class_ids'][0] for pred in predictions]
+
+print(final_pred)
+
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test, final_pred))
+
+
+
+
